@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ZERO | Today</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Thai:wght@400;500;600&display=swap"rel="stylesheet">
+        <link rel="icon" type="image/png" href="https://scontent.fkkc3-1.fna.fbcdn.net/v/t1.15752-9/632365788_678980888576049_5041985092171428880_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=0024fc&_nc_ohc=EfttYHwDp7MQ7kNvwEaNkm0&_nc_oc=Adm2ugnpUvU2XAdxorJwCUimGpSZa6BTeggWoCuX_jvQxZ-txpVBzQLk4yje_ca_N9O4QFzc1-xWiY9umo5_6PXj&_nc_zt=23&_nc_ht=scontent.fkkc3-1.fna&oh=03_Q7cD4gE-OAjb94Vo27S_LP5pNhpTO4LmvF99GNGqJ3IO3GoprA&oe=69B5488B">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="no-zoom">
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <div class="nav-logo">ZERO</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-item">
+                <i data-lucide="home"></i>
+            </a>
+            <a href="today.html" class="nav-item active">
+                <i data-lucide="calendar"></i>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i data-lucide="settings"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="page today-page">
+
+        <header class="today-header">
+            <h1>Today</h1>
+            <p class="date" id="todayDate"></p>
+        </header>
+
+        <section class="today-overview">
+            <h2>โฟกัสวันนี้</h2>
+            <p>จัดการชีวิตให้เป็นระบบ และทำให้ครบ 100%</p>
+        </section>
+
+        <!-- Stats -->
+        <section class="today-stats">
+            <div class="today-stat">
+                <span class="value" id="totalTasks">0</span>
+                <span class="label">กิจกรรม</span>
+            </div>
+
+            <div class="today-stat">
+                <span class="value" id="completedTasks">0</span>
+                <span class="label">เสร็จแล้ว</span>
+            </div>
+
+            <div class="today-stat">
+                <span class="value" id="progressPercent">0%</span>
+                <span class="label">ความคืบหน้า</span>
+            </div>
+        </section>
+
+        <!-- Progress -->
+        <section class="card progress-card">
+            <h2>ความคืบหน้าวันนี้</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </section>
+
+        <!-- Task List -->
+        <section class="card schedule">
+            <h2>รายการวันนี้</h2>
+
+            <div id="scheduleContainer"></div>
+
+            <div class="time-block empty" id="addTaskBtn">
+                <span class="time">+</span>
+                <span class="task">เพิ่มกิจกรรม</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal (ต้องอยู่นอก section) -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+
+            <h2>เพิ่มกิจกรรม</h2>
+
+            <input type="text" id="taskInput"
+                placeholder="พิมพ์กิจกรรมที่ต้องทำ..." />
+
+            <label class="time-label">เลือกเวลา</label>
+            <input type="time" id="taskTime" />
+
+            <div class="modal-actions">
+                <button class="secondary" id="cancelTask">ยกเลิก</button>
+                <button class="primary" id="saveTask">บันทึก</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="js/storage.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // แสดงวันที่
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById("todayDate").textContent =
+            today.toLocaleDateString("th-TH", options);
+
+        const modal = document.getElementById("taskModal");
+        const addBtn = document.getElementById("addTaskBtn");
+        const cancelBtn = document.getElementById("cancelTask");
+        const saveBtn = document.getElementById("saveTask");
+        const input = document.getElementById("taskInput");
+        const timeInput = document.getElementById("taskTime");
+
+        // เปิด modal
+        addBtn.addEventListener("click", () => {
+            modal.classList.add("show");
+            input.value = "";
+            timeInput.value = "";
+            input.focus();
+        });
+
+        // ปิด modal
+        cancelBtn.addEventListener("click", () => {
+            modal.classList.remove("show");
+        });
+
+        // บันทึก task (มีเวลา)
+        saveBtn.addEventListener("click", () => {
+            const title = input.value.trim();
+            const time = timeInput.value;
+
+            if (title !== "") {
+                addTask(title, time);
+                modal.classList.remove("show");
+            }
+        });
+
+        // Enter เพื่อบันทึก
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                saveBtn.click();
+            }
+        });
+
+        // โหลด task ตอนเปิดหน้า
+        renderTasks();
+    </script>
+
+</body>
+
+</html>

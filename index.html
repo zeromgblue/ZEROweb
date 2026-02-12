@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZERO</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://scontent.fkkc3-1.fna.fbcdn.net/v/t1.15752-9/632365788_678980888576049_5041985092171428880_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=0024fc&_nc_ohc=EfttYHwDp7MQ7kNvwEaNkm0&_nc_oc=Adm2ugnpUvU2XAdxorJwCUimGpSZa6BTeggWoCuX_jvQxZ-txpVBzQLk4yje_ca_N9O4QFzc1-xWiY9umo5_6PXj&_nc_zt=23&_nc_ht=scontent.fkkc3-1.fna&oh=03_Q7cD4gE-OAjb94Vo27S_LP5pNhpTO4LmvF99GNGqJ3IO3GoprA&oe=69B5488B">
+
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/animation.css">
+
+    <style>
+        .dashboard-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .dashboard-card {
+            width: 100%;
+            max-width: 1100px;
+            padding: 50px;
+            border-radius: 24px;
+            background: rgba(40, 40, 40, 0.6);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .time-section {
+            flex: 1;
+        }
+
+        .time-section h2 {
+            font-size: 20px;
+            opacity: 0.7;
+        }
+
+        .current-date {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .current-time {
+            font-size: 56px;
+            font-weight: 600;
+            margin-top: 10px;
+            color: #8b7cff;
+        }
+
+        .calendar-section {
+            flex: 1;
+        }
+
+        .calendar-section table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .calendar-section th,
+        .calendar-section td {
+            padding: 8px;
+        }
+
+        .calendar-section th {
+            opacity: 0.6;
+            font-weight: 500;
+        }
+
+        .calendar-section td {
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .calendar-section td:hover {
+            background: rgba(139, 124, 255, 0.2);
+        }
+
+        @media(max-width: 900px) {
+            .dashboard-card {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Splash -->
+    <section id="splash">
+        <h1>ZERO</h1>
+    </section>
+
+    <!-- Main -->
+    <main id="app" class="hidden">
+
+        <!-- Navigation -->
+        <nav class="top-nav">
+            <div class="nav-logo">ZERO</div>
+            <div class="nav-links">
+
+                <!-- Home -->
+                <a href="index.html" class="nav-item active">
+                    <i data-lucide="home"></i>
+                </a>
+
+                <!-- Today -->
+                <a href="today.html" class="nav-item">
+                    <i data-lucide="calendar"></i>
+                </a>
+
+
+                <!-- Settings -->
+                <a href="settings.html" class="nav-item">
+                    <i data-lucide="settings"></i>
+                </a>
+
+            </div>
+        </nav>
+
+        <!-- Dashboard -->
+        <section class="dashboard-wrapper">
+
+            <div class="dashboard-card">
+
+                <!-- เวลา -->
+                <div class="time-section">
+                    <h2>วันนี้คือ</h2>
+                    <div id="currentDate" class="current-date"></div>
+                    <div id="currentTime" class="current-time"></div>
+                </div>
+
+                <!-- ปฏิทิน -->
+                <div class="calendar-section">
+                    <div id="calendar"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- JS -->
+    <script src="js/app.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // Splash effect
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.getElementById("splash").style.display = "none";
+                document.getElementById("app").classList.remove("hidden");
+            }, 800);
+        });
+
+        // เวลา Real-time
+        function updateDateTime() {
+            const now = new Date();
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById("currentDate").textContent =
+                now.toLocaleDateString("th-TH", options);
+
+            document.getElementById("currentTime").textContent =
+                now.toLocaleTimeString("th-TH");
+        }
+
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Calendar
+        function renderCalendar() {
+            const calendar = document.getElementById("calendar");
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            let html = "<table><tr>";
+            const days = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+            days.forEach(day => html += `<th>${day}</th>`);
+            html += "</tr><tr>";
+
+            for (let i = 0; i < firstDay; i++) {
+                html += "<td></td>";
+            }
+
+            for (let date = 1; date <= lastDate; date++) {
+                if ((firstDay + date - 1) % 7 === 0) html += "</tr><tr>";
+
+                const isToday = date === now.getDate();
+                html += `<td ${isToday ? 'style="background:#8b7cff;color:#fff;"' : ""}>${date}</td>`;
+            }
+
+            html += "</tr></table>";
+            calendar.innerHTML = html;
+        }
+
+        renderCalendar();
+    </script>
+
+</body>
+
+</html>

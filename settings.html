@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ZERO – Settings</title>
+
+    <!-- Global Styles -->
+
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/settings.css" />
+
+    <!-- Icons -->
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+        <link rel="icon" type="image/png" href="https://scontent.fkkc3-1.fna.fbcdn.net/v/t1.15752-9/632365788_678980888576049_5041985092171428880_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=0024fc&_nc_ohc=EfttYHwDp7MQ7kNvwEaNkm0&_nc_oc=Adm2ugnpUvU2XAdxorJwCUimGpSZa6BTeggWoCuX_jvQxZ-txpVBzQLk4yje_ca_N9O4QFzc1-xWiY9umo5_6PXj&_nc_zt=23&_nc_ht=scontent.fkkc3-1.fna&oh=03_Q7cD4gE-OAjb94Vo27S_LP5pNhpTO4LmvF99GNGqJ3IO3GoprA&oe=69B5488B">
+</head>
+
+<body class="no-zoom">
+
+    <!-- Top Navigation -->
+
+    <nav class="top-nav">
+        <div class="nav-item" onclick="location.href='index.html'">
+            <i class='bx bx-home'></i>
+            <span>Today</span>
+        </div>
+        <div class="nav-item" onclick="location.href='checklist.html'">
+            <i class='bx bx-list-check'></i>
+            <span>Checklist</span>
+        </div>
+        <div class="nav-item" onclick="location.href='summary.html'">
+            <i class='bx bx-pie-chart-alt-2'></i>
+            <span>Summary</span>
+        </div>
+        <div class="nav-item active">
+            <i class='bx bx-cog'></i>
+            <span>Settings</span>
+        </div>
+    </nav>
+
+    <!-- Main -->
+
+    <main class="settings-page">
+
+        ```
+        <h1>Settings</h1>
+        <p class="subtitle">ตั้งค่าและจัดการข้อมูลของคุณ</p>
+
+        <section class="settings-card">
+            <h2><i class='bx bx-trash'></i> รีเซ็ตข้อมูลทั้งหมด</h2>
+            <p>ลบ Checklist และความคืบหน้าของวันนี้</p>
+            <button class="danger" id="resetData">Reset Data</button>
+        </section>
+
+        <section class="settings-card">
+            <h2><i class='bx bx-info-circle'></i> เกี่ยวกับ ZERO</h2>
+            <p>ZERO - เว็บไซต์นี้ถูกพัฒนาขึ้นโดย ZeroStudio</p>
+            <p class="small"></p>
+        </section>
+        ```
+
+    </main>
+
+    <!-- Scripts -->
+
+    <script src="js/storage.js"></script>
+
+    <script src="js/settings.js"></script>
+
+</body>
+
+</html>

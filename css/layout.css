@@ -1,0 +1,66 @@
+/* ===============================
+   TOP NAVIGATION
+=============================== */
+
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 64px;
+    padding: 0 1.2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+}
+
+/* โลโก้ */
+.nav-logo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* กล่องไอคอน */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+/* ปุ่มแต่ละอัน */
+.nav-item {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    color: var(--text-soft);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
+/* หน้าที่กำลังใช้งาน */
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--accent);
+}
+
+/* ขนาดไอคอน */
+.nav-item svg {
+    width: 20px;
+    height: 20px;
+}
