@@ -1,93 +1,96 @@
-// js/checklist.js
-
-const taskInput = document.getElementById("taskInput");
-const addTaskBtn = document.getElementById("addTaskBtn");
-const taskList = document.getElementById("taskList");
-
-let tasks = getTasks();
-
-/* =========================
-   Render Tasks
-========================= */
 function renderTasks() {
-    taskList.innerHTML = "";
+    const container = document.getElementById("scheduleContainer");
+    if (!container) return;
 
-    tasks.forEach(task => {
+    container.innerHTML = "";
+    const tasks = getTasks();
+
+    tasks.forEach((task, index) => {
+
+        // ไม่แสดง task ที่ completed แล้ว
+        if (task.completed) return;
+
         const li = document.createElement("li");
-        li.className = "task-item";
-        li.dataset.id = task.id;
-
-        if (task.done) {
-            li.classList.add("done");
-        }
+        li.className = "time-block task-item";
 
         li.innerHTML = `
-            <label>
-                <input 
-                    type="checkbox" 
-                    class="task-checkbox"
-                    ${task.done ? "checked" : ""}
-                />
-                <span class="task-text">${task.text}</span>
-            </label>
+            <span class="time">${task.time || "-"}</span>
+            <span class="task">${task.title}</span>
+
+            <div class="task-actions">
+                <button class="check-btn">
+                    <i data-lucide="check"></i>
+                </button>
+                <button class="delete-btn">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
         `;
 
-        const checkbox = li.querySelector(".task-checkbox");
-
-        checkbox.addEventListener("change", () => {
-            toggleTask(task.id);
+        // ✔ ติ๊กเสร็จ → หายทันที
+        li.querySelector(".check-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            tasks[index].completed = true;
+            saveTasks(tasks);
+            renderTasks();
         });
 
-        taskList.appendChild(li);
+        // 🗑 ลบกิจกรรม
+        li.querySelector(".delete-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            tasks.splice(index, 1);
+            saveTasks(tasks);
+            renderTasks();
+        });
+
+        container.appendChild(li);
     });
+
+    updateStats();
+    lucide.createIcons();
 }
 
-/* =========================
-   Add Task
-========================= */
-function addTask() {
-    const text = taskInput.value.trim();
-    if (!text) return;
+function addTask(title, time) {
+    const tasks = getTasks();
 
-    const newTask = {
-        id: Date.now(),
-        text,
-        done: false
-    };
-
-    tasks.push(newTask);
-    saveTasks(tasks);
-    renderTasks();
-
-    taskInput.value = "";
-}
-
-/* =========================
-   Toggle Task
-========================= */
-function toggleTask(id) {
-    tasks = tasks.map(task =>
-        task.id === id
-            ? { ...task, done: !task.done }
-            : task
-    );
+    tasks.push({
+        title: title,
+        time: time,
+        completed: false
+    });
 
     saveTasks(tasks);
     renderTasks();
 }
 
-/* =========================
-   Events
-========================= */
-addTaskBtn.addEventListener("click", addTask);
+function updateStats() {
+    const tasks = getTasks();
 
-taskInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-        addTask();
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    document.getElementById("totalTasks").textContent = total;
+    document.getElementById("completedTasks").textContent = completed;
+    document.getElementById("progressPercent").textContent = percent + "%";
+    document.getElementById("progressFill").style.width = percent + "%";
+}
+
+/* ===============================
+   รีเซ็ตอัตโนมัติเมื่อขึ้นวันใหม่
+================================= */
+
+function checkNewDay() {
+    const today = new Date().toISOString().split("T")[0];
+    const savedDate = localStorage.getItem("zero_last_date");
+
+    if (!savedDate || savedDate !== today) {
+        localStorage.setItem("zero_tasks", JSON.stringify([]));
+        localStorage.setItem("zero_last_date", today);
     }
-});
+}
 
-/* =========================
-   Init
-========================= */
-renderTasks();
+document.addEventListener("DOMContentLoaded", () => {
+    checkNewDay();   // 👈 เช็ควันก่อนทุกครั้ง
+    renderTasks();
+});

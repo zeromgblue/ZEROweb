@@ -1,5 +1,5 @@
 /* ===============================
-   TOP NAVIGATION
+   TOP NAVIGATION – ZERO Premium
 =============================== */
 
 .top-nav {
@@ -9,22 +9,32 @@
     right: 0;
 
     height: 64px;
-    padding: 0 1.2rem;
+    padding: 0 1.5rem;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(12px);
-    z-index: 100;
+    background: rgba(10, 10, 14, 0.6);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+
+    transition: all 0.4s cubic-bezier(.4,0,.2,1);
+    z-index: 1000;
 }
 
-/* โลโก้ */
-.nav-logo {
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 1px;
+/* เวลา scroll ลง เพิ่ม depth */
+.top-nav.scrolled {
+    background: rgba(10,10,14,0.85);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+
+
+.nav-logo:hover {
+    opacity: 0.8;
 }
 
 /* กล่องไอคอน */
@@ -36,31 +46,56 @@
 
 /* ปุ่มแต่ละอัน */
 .nav-item {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 12px;
+    border-radius: 14px;
     color: var(--text-soft);
-    transition: background 0.2s ease, color 0.2s ease;
+    position: relative;
+
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
 }
 
+/* Glow hover effect */
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
     color: var(--text-main);
+    transform: translateY(-2px);
+}
+
+/* เอฟเฟกต์แสงด้านใน */
+.nav-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-item:hover::after {
+    opacity: 1;
 }
 
 /* หน้าที่กำลังใช้งาน */
 .nav-item.active {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.12);
     color: var(--accent);
+    box-shadow: 0 0 15px rgba(108,108,255,0.4);
 }
 
 /* ขนาดไอคอน */
 .nav-item svg {
     width: 20px;
     height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover svg {
+    transform: scale(1.1);
 }

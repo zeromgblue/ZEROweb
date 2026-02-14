@@ -1,15 +1,9 @@
-// js/app.js
+const nav = document.querySelector(".top-nav");
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    // โหลด task ถ้ามีหน้า checklist
-    if (typeof renderTasks === "function") {
-        renderTasks();
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 20) {
+        nav.classList.add("scrolled");
+    } else {
+        nav.classList.remove("scrolled");
     }
-
-    // ถ้าอยู่หน้า summary ให้แสดง progress
-    if (document.getElementById("progressPercent")) {
-        renderProgress();
-    }
-
 });
