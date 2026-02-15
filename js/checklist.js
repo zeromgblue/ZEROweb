@@ -142,7 +142,7 @@ setInterval(() => {
                 }
 
                 // 🔥 ส่งเข้า Discord ตอนถึงเวลา
-                fetch("http://127.0.0.1:5000/notify-time", {
+                fetch("https://zeroweb-z2ee.onrender.com", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -165,3 +165,4 @@ document.addEventListener("DOMContentLoaded", () => {
     checkNewDay();
     renderTasks();
 });
+
