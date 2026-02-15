@@ -2,87 +2,98 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 from datetime import datetime
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-# 🔥 เปิด CORS ให้เว็บเรียกได้
-CORS(app, resources={r"/*": {"origins": "*"}})
+# 🔐 ดึง Webhook จาก Environment Variable
+DISCORD_WEBHOOK_URL = os.environ.get("https://discordapp.com/api/webhooks/1472595217872850945/stkj1W_jvWywvo4R_fbhK0k6fPy8JgQ-WuuTZjwAGZz6Ia7MjD6MMdrS43oUfB5kWpdJ")
 
-# 🔑 ใส่ Discord Webhook ของบลูตรงนี้
-DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1472595217872850945/stkj1W_jvWywvo4R_fbhK0k6fPy8JgQ-WuuTZjwAGZz6Ia7MjD6MMdrS43oUfB5kWpdJ"
 
+def send_embed(embed_data):
+    if not DISCORD_WEBHOOK_URL:
+        print("Webhook not set")
+        return
+
+    try:
+        response = requests.post(
+            DISCORD_WEBHOOK_URL,
+            json={"embeds": [embed_data]}
+        )
+        print("Discord response:", response.status_code)
+    except Exception as e:
+        print("Discord Error:", e)
+
+
+# ===============================
+# เพิ่ม Task
+# ===============================
 
 @app.route("/add-task", methods=["POST"])
 def add_task():
-    try:
-        data = request.get_json()
+    data = request.get_json()
 
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
-        title = data.get("title", "ไม่มีชื่อ")
-        time = data.get("time", "ไม่ระบุเวลา")
-        priority = data.get("priority", "ปกติ")
+    title = data.get("title", "ไม่มีชื่อ")
+    time_value = data.get("time", "ไม่ระบุเวลา")
+    priority = data.get("priority", "ปกติ")
 
-        embed = {
-            "title": "📌 มีกิจกรรมใหม่ใน Zeroweb",
-            "color": 5814783,
-            "fields": [
-                {
-                    "name": "📝 งาน",
-                    "value": title,
-                    "inline": False
-                },
-                {
-                    "name": "⏰ เวลา",
-                    "value": time,
-                    "inline": True
-                },
-                {
-                    "name": "🔥 ความสำคัญ",
-                    "value": priority,
-                    "inline": True
-                }
-            ],
-            "footer": {
-                "text": "Zeroweb Notification System"
-            },
-            "timestamp": datetime.utcnow().isoformat()
-        }
+    embed = {
+        "title": "📌 มีกิจกรรมใหม่ใน Zeroweb",
+        "color": 5814783,
+        "fields": [
+            {"name": "📝 งาน", "value": title, "inline": False},
+            {"name": "⏰ เวลา", "value": time_value, "inline": True},
+            {"name": "🔥 ความสำคัญ", "value": priority, "inline": True}
+        ],
+        "footer": {"text": "Zeroweb Notification System"},
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
-        response = requests.post(
-            DISCORD_WEBHOOK_URL,
-            json={"embeds": [embed]}
-        )
+    send_embed(embed)
 
-        print("Discord response:", response.status_code, response.text)
-
-        return jsonify({
-            "status": "sent",
-            "discord_status": response.status_code
-        })
-
-    except Exception as e:
-        print("ERROR:", str(e))
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"status": "sent"})
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# ===============================
+# แจ้งเตือนเมื่อถึงเวลา
+# ===============================
+
 @app.route("/notify-time", methods=["POST"])
 def notify_time():
     data = request.get_json()
 
-    title = data.get("title")
-    time = data.get("time")
+    title = data.get("title", "ไม่มีชื่อ")
+    time_value = data.get("time", "ไม่ระบุเวลา")
 
     embed = {
         "title": "⏰ ถึงเวลาแล้ว!",
         "color": 16711680,
-        "description": f"{title}\nเวลา {time}",
+        "description": f"{title}\nเวลา {time_value}",
         "timestamp": datetime.utcnow().isoformat()
     }
 
-    requests.post(DISCORD_WEBHOOK_URL, json={"embeds": [embed]})
+    send_embed(embed)
 
     return jsonify({"status": "sent"})
+
+
+# ===============================
+# Health Check (ไว้เช็คระบบ)
+# ===============================
+
+@app.route("/")
+def home():
+    return jsonify({"status": "Zeroweb Backend Online"})
+
+
+# ===============================
+# Run (รองรับ Render)
+# ===============================
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
