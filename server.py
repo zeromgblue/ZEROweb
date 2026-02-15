@@ -1,17 +1,30 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-# 🔥 เปิด CORS ให้เว็บเรียกได้
-CORS(app, resources={r"/*": {"origins": "*"}})
-
-# 🔑 ใส่ของคุณตรงนี้
-LINE_TOKEN = "YRf7bE7TO57ZcNJsI62WzFy8LgRZLPG1RWOtC4LGutOZ5iyh8Ke8YI4cvPrCLqr9eQ9V49GhJ6jtcaLzhXEWQWF6aK80fxoaS9t1tGLT2HnGW0Vi9yFdD1qlDfmUb65CxTgMkQQTtBJvuKRtpylZtQdB04t89/1O/w1cDnyilFU="
-USER_ID = "Ue07eb957873e60b329b23d12741b9e70"
+# ✅ ดึงจาก Environment Variable (ปลอดภัย)
+LINE_TOKEN = os.environ.get("ToYMn1TZZR/o+0mdelmW6fJl9GRW6w55BdSJ4xTp8lh/1slo6Fy7qGBkthZYm7YNeQ9V49GhJ6jtcaLzhXEWQWF6aK80fxoaS9t1tGLT2HkMYSquQtFihXTGAQktcTF8Glxyvxd/RrXhZkCb5JfDIQdB04t89/1O/w1cDnyilFU=")
+USER_ID = os.environ.get("Ue07eb957873e60b329b23d12741b9e70")
 
 
+@app.route("/")
+def home():
+    return "Bot is running 🚀"
+
+
+# 🔥 สำหรับรับ webhook จาก LINE
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    data = request.get_json()
+    print("Webhook received:", data)
+    return "OK", 200
+
+
+# 🔥 สำหรับส่งข้อความหา USER_ID
 @app.route("/send-line", methods=["POST"])
 def send_line():
     try:
@@ -43,19 +56,15 @@ def send_line():
             json=payload
         )
 
-        print("LINE response:", response.status_code, response.text)
-
         return jsonify({
             "status": "sent",
-            "line_status": response.status_code
+            "line_status": response.status_code,
+            "line_response": response.text
         })
 
     except Exception as e:
-        print("ERROR:", str(e))
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-@app.route("/webhook", methods=["POST"])
+    app.run()
