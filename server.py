@@ -97,3 +97,21 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+import requests
+import os
+
+DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
+
+@app.route("/test-discord")
+def test_discord():
+    data = {
+        "content": "🔥 TEST MESSAGE FROM RENDER"
+    }
+
+    response = requests.post(DISCORD_WEBHOOK_URL, json=data)
+
+    return {
+        "status_code": response.status_code,
+        "response_text": response.text
+    }
+
