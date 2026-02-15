@@ -48,31 +48,36 @@ function renderTasks() {
 }
 
 
+/* ===============================
+   เพิ่ม Task + แจ้งเตือน Discord
+================================= */
+
 function addTask(title, time) {
     const tasks = getTasks();
 
-    tasks.push({
+    const newTask = {
         title: title,
         time: time,
         completed: false
-    });
+    };
+
+    tasks.push(newTask);
 
     saveTasks(tasks);
     renderTasks();
 
-    /* ===============================
-       ส่งแจ้งเตือนเข้า LINE ตอนเพิ่ม
-    ================================= */
-
-    fetch("http://127.0.0.1:5000/send-line", {
+    // 🔥 ส่งเข้า Discord ตอนเพิ่มงาน
+    fetch("http://127.0.0.1:5000/add-task", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            message: `📌 เพิ่มกิจกรรมใหม่\n${title}\nเวลา ${time}`
+            title: title,
+            time: time,
+            priority: "ปกติ"
         })
-    }).catch(err => console.log("LINE Error:", err));
+    }).catch(err => console.log("Discord Error:", err));
 }
 
 
@@ -129,23 +134,24 @@ setInterval(() => {
 
             if (!notifiedTasks.has(uniqueKey)) {
 
-                // แจ้งเตือนใน Browser
+                // 🔔 แจ้งเตือนใน Browser
                 if (Notification.permission === "granted") {
                     new Notification("ถึงเวลาแล้ว!", {
                         body: `${task.title} - ${task.time}`
                     });
                 }
 
-                // ส่งเข้า LINE ตอนถึงเวลา
-                fetch("https://line-backend-53y1.onrender.com", {
+                // 🔥 ส่งเข้า Discord ตอนถึงเวลา
+                fetch("http://127.0.0.1:5000/notify-time", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: `⏰ ถึงเวลาแล้ว!\n${task.title}\nเวลา ${task.time}`
+                        title: task.title,
+                        time: task.time
                     })
-                }).catch(err => console.log("LINE Error:", err));
+                }).catch(err => console.log("Discord Error:", err));
 
                 notifiedTasks.add(uniqueKey);
             }
