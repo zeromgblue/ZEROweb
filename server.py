@@ -7,8 +7,15 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-LINE_TOKEN = os.environ.get("ToYMn1TZZR/o+0mdelmW6fJl9GRW6w55BdSJ4xTp8lh/1slo6Fy7qGBkthZYm7YNeQ9V49GhJ6jtcaLzhXEWQWF6aK80fxoaS9t1tGLT2HkMYSquQtFihXTGAQktcTF8Glxyvxd/RrXhZkCb5JfDIQdB04t89/1O/w1cDnyilFU=")
+# ✅ ดึงค่าจาก Environment Variables ให้ถูกต้อง
+LINE_TOKEN = os.environ.get("Io0PCMFEOAAD0aHNtT5Nv49Z1gW+8Nnhc9NhTR262lgxXi8hySqFeNYwzk0E3tZseQ9V49GhJ6jtcaLzhXEWQWF6aK80fxoaS9t1tGLT2Hm39gUlNoVFak+P2MJM0AfTqyhRUXrR6Lg8QbN61gN/ZgdB04t89/1O/w1cDnyilFU=")
 USER_ID = os.environ.get("Ue07eb957873e60b329b23d12741b9e70")
+
+if not LINE_TOKEN:
+    print("❌ LINE_TOKEN not found in environment variables")
+
+if not USER_ID:
+    print("❌ USER_ID not found in environment variables")
 
 # 🔥 เก็บข้อมูลกิจกรรมล่าสุด
 LATEST_ACTIVITY = {
@@ -66,11 +73,14 @@ def send_line():
         ]
     }
 
-    requests.post(
+    response = requests.post(
         "https://api.line.me/v2/bot/message/push",
         headers=headers,
         json=payload
     )
+
+    print("Push status:", response.status_code)
+    print("Push response:", response.text)
 
     return jsonify({"status": "sent"})
 
@@ -116,11 +126,14 @@ def webhook():
                 ]
             }
 
-            requests.post(
+            response = requests.post(
                 "https://api.line.me/v2/bot/message/reply",
                 headers=headers,
                 json=payload
             )
+
+            print("Reply status:", response.status_code)
+            print("Reply response:", response.text)
 
     return "OK", 200
 
