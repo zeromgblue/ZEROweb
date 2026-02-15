@@ -99,3 +99,13 @@
 .nav-item:hover svg {
     transform: scale(1.1);
 }
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    padding: 15px;
+}

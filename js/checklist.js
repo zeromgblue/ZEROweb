@@ -7,7 +7,6 @@ function renderTasks() {
 
     tasks.forEach((task, index) => {
 
-        // ไม่แสดง task ที่ completed แล้ว
         if (task.completed) return;
 
         const li = document.createElement("li");
@@ -27,7 +26,6 @@ function renderTasks() {
             </div>
         `;
 
-        // ✔ ติ๊กเสร็จ → หายทันที
         li.querySelector(".check-btn").addEventListener("click", (e) => {
             e.stopPropagation();
             tasks[index].completed = true;
@@ -35,7 +33,6 @@ function renderTasks() {
             renderTasks();
         });
 
-        // 🗑 ลบกิจกรรม
         li.querySelector(".delete-btn").addEventListener("click", (e) => {
             e.stopPropagation();
             tasks.splice(index, 1);
@@ -50,6 +47,7 @@ function renderTasks() {
     lucide.createIcons();
 }
 
+
 function addTask(title, time) {
     const tasks = getTasks();
 
@@ -61,7 +59,22 @@ function addTask(title, time) {
 
     saveTasks(tasks);
     renderTasks();
+
+    /* ===============================
+       ส่งแจ้งเตือนเข้า LINE ตอนเพิ่ม
+    ================================= */
+
+    fetch("http://127.0.0.1:5000/send-line", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: `📌 เพิ่มกิจกรรมใหม่\n${title}\nเวลา ${time}`
+        })
+    }).catch(err => console.log("LINE Error:", err));
 }
+
 
 function updateStats() {
     const tasks = getTasks();
@@ -75,6 +88,7 @@ function updateStats() {
     document.getElementById("progressPercent").textContent = percent + "%";
     document.getElementById("progressFill").style.width = percent + "%";
 }
+
 
 /* ===============================
    รีเซ็ตอัตโนมัติเมื่อขึ้นวันใหม่
@@ -90,7 +104,58 @@ function checkNewDay() {
     }
 }
 
+
+/* ===============================
+   ระบบแจ้งเตือนเมื่อถึงเวลา
+================================= */
+
+if ("Notification" in window) {
+    Notification.requestPermission();
+}
+
+let notifiedTasks = new Set();
+
+setInterval(() => {
+
+    const tasks = getTasks();
+    const now = new Date();
+    const currentTime = now.toTimeString().slice(0, 5);
+
+    tasks.forEach(task => {
+
+        if (!task.completed && task.time === currentTime) {
+
+            const uniqueKey = task.title + task.time;
+
+            if (!notifiedTasks.has(uniqueKey)) {
+
+                // แจ้งเตือนใน Browser
+                if (Notification.permission === "granted") {
+                    new Notification("ถึงเวลาแล้ว!", {
+                        body: `${task.title} - ${task.time}`
+                    });
+                }
+
+                // ส่งเข้า LINE ตอนถึงเวลา
+                fetch("https://line-backend-53y1.onrender.com", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `⏰ ถึงเวลาแล้ว!\n${task.title}\nเวลา ${task.time}`
+                    })
+                }).catch(err => console.log("LINE Error:", err));
+
+                notifiedTasks.add(uniqueKey);
+            }
+        }
+    });
+
+}, 1000);
+
+
 document.addEventListener("DOMContentLoaded", () => {
-    checkNewDay();   // 👈 เช็ควันก่อนทุกครั้ง
+    checkNewDay();
     renderTasks();
 });
